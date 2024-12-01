@@ -9,7 +9,7 @@ celery_app = Celery("celery_folder.celery_tasks", broker="redis://localhost:6379
 
 
 @celery_app.task(bind=True, max_retries=2, default_retry_delay=60 * 2)
-def execute_task_api(self, task_api_id: int):
+def execute_task_api(self, task_api_id: int, every: int):
     db = SessionLocal()
 
     task_api = db.query(TaskApi).filter(TaskApi.id == task_api_id).first()
@@ -19,7 +19,6 @@ def execute_task_api(self, task_api_id: int):
     task_api_result = TaskApiResult(task_api_id=task_api_id, status=ResultEnum.SUCCESSFULLY)
 
     try:
-
         print(f"Executing task {task_api_id} with method {task_api.method}")
 
         http_method = task_api.method.value.lower()
@@ -33,10 +32,14 @@ def execute_task_api(self, task_api_id: int):
             response = method_func(task_api.url)
 
         if 200 <= response.status_code <= 299:
-            task_api.status = StatusEnum.COMPLETED
+            if every == 0:
+                task_api.status = StatusEnum.COMPLETED
+                task_api.task_celery_id = None
+            else:
+                task_api.status = StatusEnum.IN_PROGRESS
+
             task_api_result.status = ResultEnum.SUCCESSFULLY
             task_api_result.response_data = response.text
-            task_api.task_celery_id = None
 
             print(f"TaskApi execution successful: {response.status_code}")
 
@@ -50,9 +53,9 @@ def execute_task_api(self, task_api_id: int):
             raise Exception()
 
     except Exception as e:
-
         try:
-            raise self.retry(exc=e)
+            if every == 0:
+                raise self.retry(exc=e, countdown=5)
 
         except Exception as e:
             if not isinstance(e, Retry):
@@ -61,12 +64,11 @@ def execute_task_api(self, task_api_id: int):
 
                 print("Max retries exceeded")
 
-        finally:
-            db.add(task_api_result)
-            db.commit()
-            db.close()
-
     finally:
+        if every != 0:
+            task_celery_id = self.apply_async(args=[task_api_id, every], countdown=every)
+            task_api.task_celery_id = task_celery_id.id
+
         db.add(task_api_result)
         db.commit()
         db.close()

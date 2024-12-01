@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, Union, Dict, Any
 from datetime import datetime
 import enum
-from db.models.base_model import Base, StatusEnum, EveryPeriodEnum, ResultEnum
+from db.models.base_model import Base, StatusEnum, ResultEnum
 
 
 class MethodEnum(enum.Enum):
@@ -23,7 +23,7 @@ class TaskApi(Base):
     method = Column(Enum(MethodEnum), nullable=False)
     url = Column(String, nullable=False)
     body = Column(JSON, nullable=False)
-    every = Column(Enum(EveryPeriodEnum), nullable=False)
+    every = Column(Integer, default=0, nullable=False)
     period = Column(DateTime, nullable=False)
     status = Column(Enum(StatusEnum), nullable=False)
 
@@ -34,7 +34,7 @@ class TaskApiCreate(BaseModel):
     method: MethodEnum
     url: str = Field(..., min_length=1)
     body: Union[Dict[str, Any], list]
-    every: EveryPeriodEnum
+    every: int
     period: Optional[datetime]
     status: StatusEnum
 

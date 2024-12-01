@@ -12,14 +12,6 @@ class StatusEnum(enum.Enum):
     FAILED = "failed"
 
 
-class EveryPeriodEnum(enum.Enum):
-    HOUR = "hour"
-    DAY = "day"
-    WEEK = "week"
-    MONTH = "month"
-    NONE = "none"
-
-
 class ResultEnum(enum.Enum):
     SUCCESSFULLY = "successfully"
     FAILED = "failed"
