@@ -44,7 +44,22 @@ def update_task_api(task_api_id: int, task_api_data: TaskApiUpdate, db: Session 
     if task_api.status == StatusEnum.IN_PROGRESS:
         start_task_api(task_api, db)
 
-    return "good"
+    return {"message": "Task updated successfully"}
+
+
+@app.delete("/delete_task_api/{task_api_id}")
+def delete_task_api(task_api_id: int, db: Session = Depends(get_db)):
+    task_api = db.query(TaskApi).filter(TaskApi.id == task_api_id).first()
+    if not task_api:
+        return {"message": "Task not found"}
+
+    if task_api.task_celery_id:
+        celery_app.control.revoke(task_api.task_celery_id, terminate=True, signal='SIGKILL')
+
+    db.delete(task_api)
+    db.commit()
+
+    return {"detail": f"Task with id {task_api_id} has been deleted"}
 
 
 def start_task_api(new_task_api: TaskApi, db):
