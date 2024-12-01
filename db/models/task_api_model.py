@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Union, Dict, Any
 from datetime import datetime
 import enum
 from db.models.base_model import Base, StatusEnum, EveryPeriodEnum, ResultEnum
@@ -10,15 +10,19 @@ from db.models.base_model import Base, StatusEnum, EveryPeriodEnum, ResultEnum
 class MethodEnum(enum.Enum):
     POST = "post"
     GET = "get"
+    PATCH = "patch"
+    PUT = "put"
+    DELETE = "delete"
 
 
 class TaskApi(Base):
     __tablename__ = "tasks_api"
 
     id = Column(Integer, primary_key=True, index=True)
+    task_celery_id = Column(String, nullable=True)
     method = Column(Enum(MethodEnum), nullable=False)
     url = Column(String, nullable=False)
-    body = Column(String, nullable=False)
+    body = Column(JSON, nullable=False)
     every = Column(Enum(EveryPeriodEnum), nullable=False)
     period = Column(DateTime, nullable=False)
     status = Column(Enum(StatusEnum), nullable=False)
@@ -29,7 +33,7 @@ class TaskApi(Base):
 class TaskApiCreate(BaseModel):
     method: MethodEnum
     url: str = Field(..., min_length=1)
-    body: str = Field(..., min_length=1)
+    body: Union[Dict[str, Any], list]
     every: EveryPeriodEnum
     period: Optional[datetime]
     status: StatusEnum

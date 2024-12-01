@@ -2,9 +2,9 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from datetime import datetime
 from db.context import get_db
-from db.models.base_model import Base, StatusEnum, EveryPeriodEnum, ResultEnum
+from db.models.base_model import Base, StatusEnum, EveryPeriodEnum
 from db.context import engine
-from db.models.task_api_model import TaskApiCreate, TaskApi, TaskApiResult
+from db.models.task_api_model import TaskApiCreate, TaskApi
 from celery_folder.celery_tasks import execute_task_api
 
 Base.metadata.create_all(bind=engine)
@@ -25,13 +25,16 @@ def add_task(data: TaskApiCreate, db: Session = Depends(get_db)):
 
             if data.period > now:
                 delay = (data.period - now).total_seconds()
-                execute_task_api.apply_async(args=[new_task_api.id], countdown=5)
-                print("Выполнение задачи через заданное время")
+                task_celery_id = execute_task_api.apply_async(args=[new_task_api.id],
+                                                              countdown=delay)
+                new_task_api.task_celery_id = task_celery_id.id
+                db.commit()
+                print(f"Выполнение задачи через: {delay}")
             else:
                 new_task_api.status = StatusEnum.PAUSED
                 db.commit()
                 print("У задачи прошло время выполнения, задача поставлена на паузу")
         else:
-            print("Запуск задачи в цикле по дням или часам")
+            print("Запуск задачи в цикле")
 
     return {"message": "Task added successfully"}
