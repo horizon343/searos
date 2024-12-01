@@ -39,6 +39,15 @@ class TaskApiCreate(BaseModel):
     status: StatusEnum
 
 
+class TaskApiUpdate(BaseModel):
+    method: Optional[MethodEnum] = None
+    url: Optional[str] = None
+    body: Optional[Union[Dict[str, Any], list]] = None
+    every: Optional[int] = None
+    period: Optional[datetime] = None
+    status: Optional[StatusEnum] = None
+
+
 class TaskApiResult(Base):
     __tablename__ = "tasks_api_result"
 

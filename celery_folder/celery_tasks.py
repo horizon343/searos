@@ -55,7 +55,7 @@ def execute_task_api(self, task_api_id: int, every: int):
     except Exception as e:
         try:
             if every == 0:
-                raise self.retry(exc=e, countdown=5)
+                raise self.retry(exc=e, countdown=20)
 
         except Exception as e:
             if not isinstance(e, Retry):
