@@ -97,6 +97,21 @@ def update_task_sql(task_sql_id: int, task_sql_data: TaskSqlUpdate, db: Session 
     return {"message": "Task updated successfully"}
 
 
+@app.delete("/delete_task_sql/{task_sql_id}")
+def delete_task_sql(task_sql_id: int, db: Session = Depends(get_db)):
+    task_sql = db.query(TaskSql).filter(TaskSql.id == task_sql_id).first()
+    if not task_sql:
+        return {"message": "Task not found"}
+
+    if task_sql.task_celery_id:
+        celery_app.control.revoke(task_sql.task_celery_id, terminate=True, signal='SIGKILL')
+
+    db.delete(task_sql)
+    db.commit()
+
+    return {"message": f"Task deleted successfully"}
+
+
 def start_task(new_task, db, execute_task):
     if new_task.every == 0:
         now = datetime.now()
