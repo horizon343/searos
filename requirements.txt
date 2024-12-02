@@ -4,3 +4,5 @@ pydantic==2.10.2
 celery==5.5.0rc2
 redis==5.0.0
 requests==2.32.0
+sqladmin==0.20.1
+starlette==0.41.3
