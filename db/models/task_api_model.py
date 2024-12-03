@@ -20,12 +20,12 @@ class TaskApi(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     task_celery_id = Column(String, nullable=True)
-    method = Column(Enum(MethodEnum), nullable=False)
+    method = Column(Enum(MethodEnum), default=MethodEnum.GET, nullable=False)
     url = Column(String, nullable=False)
     body = Column(JSON, nullable=False)
     every = Column(Integer, default=0, nullable=False)
-    period = Column(DateTime, nullable=False)
-    status = Column(Enum(StatusEnum), nullable=False)
+    period = Column(DateTime, default=datetime.now(), nullable=False)
+    status = Column(Enum(StatusEnum), default=StatusEnum.IN_PROGRESS, nullable=False)
 
     results = relationship("TaskApiResult", back_populates="task", cascade="all, delete-orphan")
 
@@ -34,17 +34,12 @@ class TaskApiCreate(BaseModel):
     method: MethodEnum
     url: str = Field(..., min_length=1)
     body: Union[Dict[str, Any], list]
-    every: int
+    every: int = 0
     period: Optional[datetime]
     status: StatusEnum
 
 
 class TaskApiUpdate(BaseModel):
-    method: Optional[MethodEnum] = None
-    url: Optional[str] = None
-    body: Optional[Union[Dict[str, Any], list]] = None
-    every: Optional[int] = None
-    period: Optional[datetime] = None
     status: Optional[StatusEnum] = None
 
 

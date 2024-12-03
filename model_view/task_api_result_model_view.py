@@ -12,10 +12,10 @@ class TaskApiResultModelView(ModelView, model=TaskApiResult):
     can_delete = True
     can_view_details = True
 
-    name = "task api result"
-    name_plural = "task api result"
+    name = "tasks result"
+    name_plural = "tasks result"
     icon = "fa-solid fa-square-poll-vertical"
-    category = "results"
+    category = "task api"
 
     column_list = [TaskApiResult.id, TaskApiResult.task_api_id, TaskApiResult.response_data,
                    TaskApiResult.created_at, TaskApiResult.status]

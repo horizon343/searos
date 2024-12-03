@@ -10,7 +10,7 @@ def start_task(new_task, db, execute_task):
             delay = (new_task.period - now).total_seconds()
 
             task_celery_id = execute_task.apply_async(args=[new_task.id, new_task.every],
-                                                      countdown=5)
+                                                      countdown=delay)
             new_task.task_celery_id = task_celery_id.id
 
             db.commit()

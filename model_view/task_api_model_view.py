@@ -14,10 +14,10 @@ class TaskApiModelView(ModelView, model=TaskApi):
     can_delete = True
     can_view_details = True
 
-    name = "task api"
-    name_plural = "task api"
+    name = "tasks"
+    name_plural = "tasks"
     icon = "fa-brands fa-quinscape"
-    category = "tasks"
+    category = "task api"
 
     form_columns = [TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every, TaskApi.period,
                     TaskApi.status]
