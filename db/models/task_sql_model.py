@@ -14,8 +14,8 @@ class TaskSql(Base):
     connect_string = Column(String, nullable=False)
     query = Column(String, nullable=False)
     every = Column(Integer, default=0, nullable=False)
-    period = Column(DateTime, nullable=False)
-    status = Column(Enum(StatusEnum), nullable=False)
+    period = Column(DateTime, default=datetime.now(), nullable=False)
+    status = Column(Enum(StatusEnum), default=StatusEnum.IN_PROGRESS, nullable=False)
 
     results = relationship("TaskSqlResult", back_populates="task", cascade="all, delete-orphan")
 
@@ -29,10 +29,6 @@ class TaskSqlCreate(BaseModel):
 
 
 class TaskSqlUpdate(BaseModel):
-    connect_string: Optional[str] = None
-    query: Optional[str] = None
-    every: Optional[int] = None
-    period: Optional[datetime] = None
     status: Optional[StatusEnum] = None
 
 

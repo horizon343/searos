@@ -7,9 +7,11 @@ from db.models.base_model import Base, StatusEnum
 from db.models.task_api_model import TaskApiCreate, TaskApi, TaskApiUpdate
 from db.models.task_sql_model import TaskSqlCreate, TaskSql, TaskSqlUpdate
 from db.models.user_model import User
-from celery_folder.celery_tasks import execute_task_api, celery_app, execute_task_sql
 from model_view.task_api_model_view import TaskApiModelView
+from model_view.task_sql_model_view import TaskSqlModelView
 from model_view.task_api_result_model_view import TaskApiResultModelView
+from model_view.task_sql_result_model_view import TaskSqlResultModelView
+from celery_folder.celery_tasks import execute_task_api, celery_app, execute_task_sql
 from start_task import start_task
 
 Base.metadata.create_all(bind=engine)
@@ -57,6 +59,8 @@ class UserAdmin(ModelView, model=User):
 admin.add_view(UserAdmin)
 admin.add_view(TaskApiModelView)
 admin.add_view(TaskApiResultModelView)
+admin.add_view(TaskSqlModelView)
+admin.add_view(TaskSqlResultModelView)
 
 
 @app.post("/add_task_api")
