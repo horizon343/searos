@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Depends
+import os
+from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from sqladmin import Admin, ModelView, action
+from sqladmin import Admin
 from authentication import AdminAuth
-from db.context import get_db, engine
+from db.context import get_db, engine, SessionLocal
 from db.models.base_model import Base, StatusEnum
 from db.models.task_api_model import TaskApiCreate, TaskApi, TaskApiUpdate
 from db.models.task_sql_model import TaskSqlCreate, TaskSql, TaskSqlUpdate
@@ -11,50 +13,25 @@ from model_view.task_api_model_view import TaskApiModelView
 from model_view.task_sql_model_view import TaskSqlModelView
 from model_view.task_api_result_model_view import TaskApiResultModelView
 from model_view.task_sql_result_model_view import TaskSqlResultModelView
+from model_view.user_admin_model_view import UserAdmin
 from celery_folder.celery_tasks import execute_task_api, celery_app, execute_task_sql
 from start_task import start_task
 
+load_dotenv()
+secret_key = os.environ["ADMIN_AUTH_SECRET_KEY"]
+
 Base.metadata.create_all(bind=engine)
 
-authentication_backend = AdminAuth(secret_key="super_secret_key")
+authentication_backend = AdminAuth(secret_key=secret_key)
+
+db = SessionLocal()
+adminUser: User = User(name="admin", password="admin")
+db.add(adminUser)
+db.commit()
+db.close()
 
 app = FastAPI()
 admin = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
-
-
-class UserAdmin(ModelView, model=User):
-    can_create = True
-    can_edit = True
-    can_delete = True
-    can_view_details = True
-
-    name = "User"
-    name_plural = "Users"
-    icon = "fa-solid fa-user"
-    category = "accounts"
-
-    column_list = [User.id, User.name, User.email, "user.address.zip_code"]
-    column_searchable_list = [User.name]
-    column_sortable_list = [User.id]
-    column_formatters = {User.name: lambda m, a: m.name[:10]}
-    column_default_sort = [(User.email, True), (User.name, False)]
-
-    column_details_list = [User.id, User.name, "user.address.zip_code"]
-    column_formatters_detail = {User.name: lambda m, a: m.name[:10]}
-
-    page_size = 50
-    page_size_options = [25, 50, 100, 200]
-
-    @action(
-        name="approve_users",
-        label="Approve",
-        confirmation_message="Are you sure?",
-        add_in_detail=True,
-        add_in_list=True,
-    )
-    async def approve_users(self, request):
-        print("approve_users")
-
 
 admin.add_view(UserAdmin)
 admin.add_view(TaskApiModelView)

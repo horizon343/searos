@@ -6,3 +6,4 @@ redis==5.0.0
 requests==2.32.0
 sqladmin==0.20.1
 starlette==0.41.3
+python-dotenv==1.0.1

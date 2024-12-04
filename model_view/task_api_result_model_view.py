@@ -11,11 +11,17 @@ class TaskApiResultModelView(ModelView, model=TaskApiResult):
     can_edit = False
     can_delete = True
     can_view_details = True
+    can_export = True
 
     name = "tasks result"
     name_plural = "tasks result"
     icon = "fa-solid fa-square-poll-vertical"
     category = "task api"
+
+    column_export_list = [TaskApiResult.id, TaskApiResult.task_api_id, TaskApiResult.response_data,
+                          TaskApiResult.created_at, TaskApiResult.status]
+    export_types = ["csv", "json"]
+    export_max_rows = 500
 
     column_list = [TaskApiResult.id, TaskApiResult.task_api_id, TaskApiResult.response_data,
                    TaskApiResult.created_at, TaskApiResult.status]

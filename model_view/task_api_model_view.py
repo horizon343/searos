@@ -13,6 +13,7 @@ class TaskApiModelView(ModelView, model=TaskApi):
     can_edit = False
     can_delete = True
     can_view_details = True
+    can_export = True
 
     name = "tasks"
     name_plural = "tasks"
@@ -21,6 +22,11 @@ class TaskApiModelView(ModelView, model=TaskApi):
 
     form_columns = [TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every, TaskApi.period,
                     TaskApi.status]
+
+    column_export_list = [TaskApi.id, TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every,
+                          TaskApi.period, TaskApi.status]
+    export_types = ["csv", "json"]
+    export_max_rows = 500
 
     column_list = [TaskApi.id, TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every,
                    TaskApi.period, TaskApi.status]

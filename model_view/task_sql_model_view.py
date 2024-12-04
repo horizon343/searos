@@ -13,11 +13,17 @@ class TaskSqlModelView(ModelView, model=TaskSql):
     can_edit = False
     can_delete = True
     can_view_details = True
+    can_export = True
 
     name = "tasks"
     name_plural = "tasks"
-    icon = "fa-brands fa-quinscape"
+    icon = "fa-solid fa-database"
     category = "task sql"
+
+    column_export_list = [TaskSql.id, TaskSql.connect_string, TaskSql.query, TaskSql.every,
+                          TaskSql.period, TaskSql.status]
+    export_types = ["csv", "json"]
+    export_max_rows = 500
 
     form_columns = [TaskSql.connect_string, TaskSql.query, TaskSql.every, TaskSql.period,
                     TaskSql.status]

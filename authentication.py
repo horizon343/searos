@@ -1,5 +1,7 @@
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
+from db.context import SessionLocal
+from db.models.user_model import User
 
 
 class AdminAuth(AuthenticationBackend):
@@ -7,11 +9,15 @@ class AdminAuth(AuthenticationBackend):
         form = await request.form()
         username, password = form["username"], form["password"]
 
-        if username == "admin" and password == "admin":
-            request.session.update({"token": "super_secret_token"})
-            return True
+        db = SessionLocal()
+        user = db.query(User).filter((User.name == username) & (User.password == password)).first()
+        db.close()
 
-        return False
+        if not user:
+            return False
+
+        request.session.update({"token": username + " " + password})
+        return True
 
     async def logout(self, request: Request) -> bool:
         request.session.clear()
@@ -19,8 +25,18 @@ class AdminAuth(AuthenticationBackend):
 
     async def authenticate(self, request: Request) -> bool:
         token = request.session.get("token")
+        if not token:
+            return False
 
-        if not token or token != "super_secret_token":
+        user = token.split(" ")
+        if not user[0] or not user[1]:
+            return False
+
+        db = SessionLocal()
+        usr = db.query(User).filter((User.name == user[0]) & (User.password == user[1])).first()
+        db.close()
+
+        if not usr:
             return False
 
         return True
