@@ -1,5 +1,5 @@
 from db.models.user_model import User
-from sqladmin import ModelView, action
+from sqladmin import ModelView
 
 
 class UserAdmin(ModelView, model=User):
@@ -7,6 +7,7 @@ class UserAdmin(ModelView, model=User):
     can_edit = True
     can_delete = True
     can_view_details = True
+    can_export = False
 
     name = "users"
     name_plural = "users"

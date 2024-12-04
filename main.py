@@ -24,12 +24,6 @@ Base.metadata.create_all(bind=engine)
 
 authentication_backend = AdminAuth(secret_key=secret_key)
 
-db = SessionLocal()
-adminUser: User = User(name="admin", password="admin")
-db.add(adminUser)
-db.commit()
-db.close()
-
 app = FastAPI()
 admin = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
 
@@ -138,3 +132,17 @@ def delete_task_sql(task_sql_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": f"Task deleted successfully"}
+
+
+def add_admin():
+    db = SessionLocal()
+
+    admin_user: User = User(name="admin", password="admin")
+    admin_db = db.query(User).filter(User.name == admin_user.name).first()
+    if not admin_db:
+        db.add(admin_user)
+    db.commit()
+    db.close()
+
+
+add_admin()
