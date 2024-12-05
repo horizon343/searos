@@ -21,21 +21,26 @@ class TaskSqlModelView(ModelView, model=TaskSql):
     category = "task sql"
 
     column_export_list = [TaskSql.id, TaskSql.connect_string, TaskSql.query, TaskSql.every,
-                          TaskSql.period, TaskSql.status]
+                          TaskSql.period, TaskSql.status, TaskSql.notification_type,
+                          TaskSql.result_in_notification, TaskSql.notification_addr]
     export_types = ["csv", "json"]
     export_max_rows = 500
 
     form_columns = [TaskSql.connect_string, TaskSql.query, TaskSql.every, TaskSql.period,
-                    TaskSql.status]
+                    TaskSql.status, TaskSql.notification_type, TaskSql.result_in_notification,
+                    TaskSql.notification_addr]
 
     column_list = [TaskSql.id, TaskSql.connect_string, TaskSql.query, TaskSql.every,
-                   TaskSql.period, TaskSql.status]
+                   TaskSql.period, TaskSql.status, TaskSql.notification_type,
+                   TaskSql.result_in_notification, TaskSql.notification_addr]
     column_searchable_list = [TaskSql.id]
     column_sortable_list = [TaskSql.id, TaskSql.connect_string, TaskSql.every, TaskSql.period,
-                            TaskSql.status]
+                            TaskSql.status, TaskSql.notification_type,
+                            TaskSql.result_in_notification, TaskSql.notification_addr]
 
     column_details_list = [TaskSql.id, TaskSql.connect_string, TaskSql.query, TaskSql.every,
-                           TaskSql.period, TaskSql.status]
+                           TaskSql.period, TaskSql.status, TaskSql.notification_type,
+                           TaskSql.result_in_notification, TaskSql.notification_addr]
 
     page_size = 50
     page_size_options = [25, 50, 100, 200]

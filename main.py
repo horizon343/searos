@@ -90,7 +90,10 @@ def delete_task_api(task_api_id: int, db: Session = Depends(get_db)):
 @app.post("/add_task_sql")
 def add_task_sql(data: TaskSqlCreate, db: Session = Depends(get_db)):
     new_task_sql = TaskSql(connect_string=data.connect_string, query=data.query, every=data.every,
-                           period=data.period, status=data.status)
+                           period=data.period, status=data.status,
+                           notification_type=data.notification_type,
+                           result_in_notification=data.result_in_notification,
+                           notification_addr=data.notification_addr)
     db.add(new_task_sql)
     db.commit()
 

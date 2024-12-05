@@ -135,6 +135,9 @@ def execute_task_sql(self, task_sql_id: int, every: int):
             task_celery_id = self.apply_async(args=[task_sql_id, every], countdown=every)
             task_sql.task_celery_id = task_celery_id.id
 
+        if task_sql.notification_type != NotificationTypeEnum.NONE:
+            notification_send(task_sql, task_sql_result)
+
         db.add(task_sql_result)
         db.commit()
         db.close()
