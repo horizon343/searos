@@ -15,3 +15,8 @@ class StatusEnum(enum.Enum):
 class ResultEnum(enum.Enum):
     SUCCESSFULLY = "successfully"
     FAILED = "failed"
+
+
+class NotificationTypeEnum(enum.Enum):
+    NONE = "none"
+    EMAIL = "email"

@@ -21,21 +21,26 @@ class TaskApiModelView(ModelView, model=TaskApi):
     category = "task api"
 
     form_columns = [TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every, TaskApi.period,
-                    TaskApi.status]
+                    TaskApi.status, TaskApi.notification_type, TaskApi.result_in_notification,
+                    TaskApi.notification_addr]
 
     column_export_list = [TaskApi.id, TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every,
-                          TaskApi.period, TaskApi.status]
+                          TaskApi.period, TaskApi.status, TaskApi.notification_type,
+                          TaskApi.result_in_notification, TaskApi.notification_addr]
     export_types = ["csv", "json"]
     export_max_rows = 500
 
     column_list = [TaskApi.id, TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every,
-                   TaskApi.period, TaskApi.status]
+                   TaskApi.period, TaskApi.status, TaskApi.notification_type,
+                   TaskApi.result_in_notification, TaskApi.notification_addr]
     column_searchable_list = [TaskApi.id]
     column_sortable_list = [TaskApi.id, TaskApi.method, TaskApi.url, TaskApi.every, TaskApi.period,
-                            TaskApi.status]
+                            TaskApi.status, TaskApi.notification_type,
+                            TaskApi.result_in_notification, TaskApi.notification_addr]
 
     column_details_list = [TaskApi.id, TaskApi.method, TaskApi.url, TaskApi.body, TaskApi.every,
-                           TaskApi.period, TaskApi.status]
+                           TaskApi.period, TaskApi.status, TaskApi.notification_type,
+                           TaskApi.result_in_notification, TaskApi.notification_addr]
 
     page_size = 50
     page_size_options = [25, 50, 100, 200]

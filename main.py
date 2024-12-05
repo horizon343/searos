@@ -36,8 +36,11 @@ admin.add_view(TaskSqlResultModelView)
 
 @app.post("/add_task_api")
 def add_task_api(data: TaskApiCreate, db: Session = Depends(get_db)):
-    new_task_api = TaskApi(method=data.method, url=data.url, body=data.body, every=data.every,
-                           period=data.period, status=data.status)
+    new_task_api: TaskApi = TaskApi(method=data.method, url=data.url, body=data.body,
+                                    every=data.every, period=data.period, status=data.status,
+                                    notification_type=data.notification_type,
+                                    result_in_notification=data.result_in_notification,
+                                    notification_addr=data.notification_addr)
     db.add(new_task_api)
     db.commit()
 

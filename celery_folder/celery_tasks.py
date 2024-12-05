@@ -5,9 +5,10 @@ from sqlalchemy.engine import Engine
 import requests
 import json
 from db.context import SessionLocal
-from db.models.base_model import StatusEnum, ResultEnum
+from db.models.base_model import StatusEnum, ResultEnum, NotificationTypeEnum
 from db.models.task_api_model import TaskApi, TaskApiResult
 from db.models.task_sql_model import TaskSql, TaskSqlResult
+from notifications.notification import notification_send
 
 celery_app = Celery("celery_folder.celery_tasks", broker="redis://localhost:6379/0")
 
@@ -72,6 +73,9 @@ def execute_task_api(self, task_api_id: int, every: int):
         if every != 0:
             task_celery_id = self.apply_async(args=[task_api_id, every], countdown=every)
             task_api.task_celery_id = task_celery_id.id
+
+        if task_api.notification_type != NotificationTypeEnum.NONE:
+            notification_send(task_api, task_api_result)
 
         db.add(task_api_result)
         db.commit()
