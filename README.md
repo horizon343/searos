@@ -55,7 +55,14 @@ pip install -r requirements.txt
 
 3. Настройка переменных окружения
 
-Создайте файл .env и добавьте: `ADMIN_AUTH_SECRET_KEY=<СЕКРЕТНЫЙ_КЛЮЧ_АВТОРИЗАЦИИ>`
+Создайте файл .env и добавьте:
+
+* `ADMIN_AUTH_SECRET_KEY=<СЕКРЕТНЫЙ_КЛЮЧ_АВТОРИЗАЦИИ>`
+* `SMTP_PORT=<ПОРТ_SMTP>`
+* `SMTP_SERVER=<СЕРВЕР>`
+* `SMTP_SENDER_EMAIL=<EMAIL_АДРЕС_ОТПРАВИТЕЛЯ>`
+* `SMTP_PASSWORD=<ПАРОЛЬ_SMTP_СЕРВЕРА>`
+
 ***
 
 ## ▶️ Запуск проекта
