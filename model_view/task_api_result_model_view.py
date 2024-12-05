@@ -1,5 +1,8 @@
-from sqladmin import ModelView
+from sqladmin import ModelView, action
+from starlette.responses import JSONResponse
+from starlette.requests import Request
 from db.models.task_api_model import TaskApiResult
+from db.context import SessionLocal
 
 
 class TaskApiResultModelView(ModelView, model=TaskApiResult):
@@ -36,4 +39,36 @@ class TaskApiResultModelView(ModelView, model=TaskApiResult):
                            TaskApiResult.status]
 
     page_size = 50
-    page_size_options = [25, 50, 100, 200]
+    page_size_options = [25, 50, 100, 200, 500, 1000]
+
+    @action(name="export_to_json",
+            label="Export to JSON",
+            confirmation_message="Вы точно хотите экспортировать выбранные результаты задач?",
+            add_in_detail=True,
+            add_in_list=True)
+    async def export_to_json(self, request: Request):
+        db = SessionLocal()
+
+        pks = request.query_params.get("pks", "").split(",")
+        if not pks:
+            db.close()
+            return JSONResponse({"error": "No tasks_result selected for export"}, status_code=400)
+
+        tasks = db.query(TaskApiResult).filter(TaskApiResult.id.in_(pks)).all()
+        db.close()
+
+        data = [
+            {
+                "id": task.id,
+                "task_api_id": task.task_api_id,
+                "response_data": task.response_data,
+                "created_at": task.created_at.isoformat() if task.created_at else None,
+                "status": task.status.value
+            }
+            for task in tasks
+        ]
+
+        return JSONResponse(
+            content={"tasks_result": data},
+            media_type="application/json",
+            headers={"Content-Disposition": "attachment; filename=tasks_api_result.json"})

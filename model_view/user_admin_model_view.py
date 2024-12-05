@@ -21,4 +21,4 @@ class UserAdmin(ModelView, model=User):
     column_details_list = [User.id, User.name]
 
     page_size = 50
-    page_size_options = [25, 50, 100, 200]
+    page_size_options = [25, 50, 100, 200, 500, 1000]

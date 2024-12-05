@@ -1,4 +1,6 @@
 from sqladmin import ModelView, action
+import json
+from starlette.responses import JSONResponse
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from celery_folder.celery_tasks import execute_task_api, celery_app
@@ -43,7 +45,7 @@ class TaskApiModelView(ModelView, model=TaskApi):
                            TaskApi.result_in_notification, TaskApi.notification_addr]
 
     page_size = 50
-    page_size_options = [25, 50, 100, 200]
+    page_size_options = [25, 50, 100, 200, 500, 1000]
 
     @action(name="start_task_api",
             label="Start tasks",
@@ -96,6 +98,43 @@ class TaskApiModelView(ModelView, model=TaskApi):
 
         referer = request.headers.get("Referer")
         return RedirectResponse(referer)
+
+    @action(name="export_to_json",
+            label="Export to JSON",
+            confirmation_message="Вы точно хотите экспортировать выбранные задачи?",
+            add_in_detail=True,
+            add_in_list=True)
+    async def export_to_json(self, request: Request):
+        db = SessionLocal()
+
+        pks = request.query_params.get("pks", "").split(",")
+        if not pks:
+            db.close()
+            return JSONResponse({"error": "No tasks selected for export"}, status_code=400)
+
+        tasks = db.query(TaskApi).filter(TaskApi.id.in_(pks)).all()
+        db.close()
+
+        data = [
+            {
+                "id": task.id,
+                "method": task.method.value,
+                "url": task.url,
+                "body": task.body,
+                "every": task.every,
+                "period": task.period.isoformat() if task.period else None,
+                "status": task.status.value,
+                "notification_type": task.notification_type.value,
+                "result_in_notification": task.result_in_notification,
+                "notification_addr": task.notification_addr
+            }
+            for task in tasks
+        ]
+
+        return JSONResponse(
+            content={"tasks": data},
+            media_type="application/json",
+            headers={"Content-Disposition": "attachment; filename=tasks_api.json"})
 
     async def after_model_change(self, data: dict, model: TaskApi, is_created: bool,
                                  request: Request):
